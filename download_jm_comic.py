@@ -11,6 +11,7 @@ from utils.permission import white_list_handle
 from utils import group_only, get_time_zone, get_config_path
 from utils.push_manager import PushManager
 from utils.task_deliver import TaskDeliverManager
+from utils.upload_file_stream.upload_file_stream import UploadFileStream
 
 download_jm_comic = on_regex(
     pattern=r"^(JM|jm) ([0-9]*)$",
@@ -46,13 +47,26 @@ async def download(**kwargs):
     #     ProtocolAdapter.get_msg_type_id(event),
     #     "KMR_JM_DOWNLOAD"
     # )
+    ufs = await UploadFileStream.connect()
+    try:
+        dst_file_path = await ufs.upload_file_stream_batch(file_path)
+    except Exception as e:
+        logger.error(f"download_jm_comic upload_file_stream_batch fail ! error = {e}")
+        PushManager.notify(PushManager.PushData(
+            msg_type=ProtocolAdapter.get_msg_type(event),
+            msg_type_id=ProtocolAdapter.get_msg_type_id(event),
+            message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件上传失败")))
+        return
+    finally:
+        ufs.close()
+
     await ProtocolAdapter.Group.upload_group_file(
         ProtocolAdapter.get_bot_id(bot),
         ProtocolAdapter.get_msg_type_id(event),
-        file_path,
+        dst_file_path,
         f"JM_{id}.zip",
         "") # 目前写了这个有问题，就先不写了
-
+    
     # PushManager.notify(PushManager.PushData(
     #     msg_type=ProtocolAdapter.get_msg_type(event),
     #     msg_type_id=ProtocolAdapter.get_msg_type_id(event),
