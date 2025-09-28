@@ -1,0 +1,8 @@
+# kmrbot
+venv
+.idea
+bot_data
+plugins
+*.pyc
+.gitmodules
+configs
