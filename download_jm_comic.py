@@ -50,16 +50,16 @@ async def download(**kwargs):
     ufs = await UploadFileStream.connect()
     try:
         dst_file_path = await ufs.upload_file_stream_batch(file_path)
+        PushManager.notify(PushManager.PushData(
+            msg_type=ProtocolAdapter.get_msg_type(event),
+            msg_type_id=ProtocolAdapter.get_msg_type_id(event),
+            message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件已下载完毕.正在上传...")))
         await ProtocolAdapter.Group.upload_group_file(
             ProtocolAdapter.get_bot_id(bot),
             ProtocolAdapter.get_msg_type_id(event),
             dst_file_path,
             f"JM_{id}.zip",
             "") # 目前写了这个有问题，就先不写了
-        PushManager.notify(PushManager.PushData(
-            msg_type=ProtocolAdapter.get_msg_type(event),
-            msg_type_id=ProtocolAdapter.get_msg_type_id(event),
-            message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件已下载完毕.正在上传...")))
     except Exception as e:
         logger.error(f"download_jm_comic upload fail ! error = {e}")
         PushManager.notify(PushManager.PushData(
