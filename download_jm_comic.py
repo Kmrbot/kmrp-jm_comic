@@ -50,6 +50,7 @@ async def download(**kwargs):
                 msg_type=ProtocolAdapter.get_msg_type(event),
                 msg_type_id=ProtocolAdapter.get_msg_type_id(event),
                 message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件下载失败.不存在本子id {id}.")))
+            await download_jm_comic.finish()
     else:
         logger.info(f"download jm comic id {id} file exist. Ignore.")
     # 找对应文件并上传到群中，默认存到./download里
