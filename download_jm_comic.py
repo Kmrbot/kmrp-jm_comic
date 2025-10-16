@@ -2,6 +2,8 @@ import os
 
 import jmcomic
 from typing import Tuple, Any
+
+from jmcomic import MissingAlbumPhotoException
 from nonebot.rule import to_me
 from protocol_adapter.adapter_type import AdapterGroupMessageEvent, AdapterBot
 from protocol_adapter.protocol_adapter import ProtocolAdapter
@@ -38,7 +40,16 @@ async def download(**kwargs):
             jmcomic.download_album(id, option)
         except Exception as e:
             logger.warning(f"download jm comic id {id} fail.")
+            PushManager.notify(PushManager.PushData(
+                msg_type=ProtocolAdapter.get_msg_type(event),
+                msg_type_id=ProtocolAdapter.get_msg_type_id(event),
+                message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件下载失败.")))
             await download_jm_comic.finish()
+        except MissingAlbumPhotoException as e:
+            PushManager.notify(PushManager.PushData(
+                msg_type=ProtocolAdapter.get_msg_type(event),
+                msg_type_id=ProtocolAdapter.get_msg_type_id(event),
+                message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text(f"文件下载失败.不存在本子id {id}.")))
     else:
         logger.info(f"download jm comic id {id} file exist. Ignore.")
     # 找对应文件并上传到群中，默认存到./download里
