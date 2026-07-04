@@ -9,6 +9,7 @@ from protocol_adapter.adapter_type import AdapterGroupMessageEvent, AdapterBot
 from protocol_adapter.protocol_adapter import ProtocolAdapter
 from nonebot import on_regex, logger
 from nonebot.params import RegexGroup
+from configs.common import CommonConfig
 from utils import get_config_path
 from utils.permission import group_only, white_list_handle
 from utils.push_manager import PushManager
@@ -32,6 +33,12 @@ async def download(**kwargs):
     bot = kwargs["bot"]
     event = kwargs["event"]
     id = kwargs["id"]
+    if not CommonConfig.is_upload_file_stream_configured():
+        PushManager.notify(PushManager.PushData(
+            msg_type=ProtocolAdapter.get_msg_type(event),
+            msg_type_id=ProtocolAdapter.get_msg_type_id(event),
+            message=ProtocolAdapter.MS.reply(event) + ProtocolAdapter.MS.text("未配置 upload_file_stream,无法上传群文件.")))
+        return
     # 首先判断一下有没有对应的zip，有就直接发
     file_path = f"{os.getcwd()}/jm_download/{id}.zip"
     if not os.path.exists(file_path):
