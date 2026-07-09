@@ -10,7 +10,7 @@ from protocol_adapter.protocol_adapter import ProtocolAdapter
 from nonebot import on_regex, logger
 from nonebot.params import RegexGroup
 from configs.common import CommonConfig
-from utils import get_config_path
+from utils.paths import get_config_path
 from utils.permission import group_only, white_list_handle
 from utils.push_manager import PushManager
 from utils.task_deliver import TaskDeliverManager
