@@ -9,8 +9,7 @@ from protocol_adapter.adapter_type import AdapterGroupMessageEvent, AdapterBot
 from protocol_adapter.protocol_adapter import ProtocolAdapter
 from nonebot import on_regex, logger
 from nonebot.params import RegexGroup
-from configs.common import CommonConfig
-from utils.paths import get_config_path
+from utils.config import CommonConfig, ensure_bot_data_config_dirs, get_plugin_config_path
 from utils.permission import group_only, white_list_handle
 from utils.push_manager import PushManager
 from utils.task_deliver import TaskDeliverManager
@@ -42,7 +41,8 @@ async def download(**kwargs):
     # 首先判断一下有没有对应的zip，有就直接发
     file_path = f"{os.getcwd()}/jm_download/{id}.zip"
     if not os.path.exists(file_path):
-        option = jmcomic.create_option_by_file(str(get_config_path().joinpath("jm_comic/config.yml")))
+        ensure_bot_data_config_dirs()
+        option = jmcomic.create_option_by_file(str(get_plugin_config_path("kmrp-jm_comic", "config.yml")))
         try:
             jmcomic.download_album(id, option)
         except Exception as e:
